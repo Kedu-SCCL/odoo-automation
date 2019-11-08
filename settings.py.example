@@ -1,0 +1,13 @@
+#!/usr/bin/python
+
+# Odoo instance URL. API is enabled by default, no extra config steps needed
+odoo_url = 'https:/example.com'
+
+# Odoo database
+odoo_db = 'odd_db'
+
+# Odoo user name
+odoo_user = 'user@example.com'
+
+# B64encoded Odoo user password
+odoo_password = b'b64encodedpassword'
