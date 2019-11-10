@@ -147,6 +147,9 @@ class Odoo():
         # TODO: make sure that no crm leads exception is being catched here
         except Fault as e:
             return 0
+        # Special case: 0 leads
+        except ValueError as e:
+            return 0
 
     def create_lead(self, name, description):
         '''
