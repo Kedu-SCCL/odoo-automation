@@ -31,14 +31,11 @@ class Odoo():
         self.uid = self.common.authenticate(self.db, self.user,
                                     b64decode(self.password).decode('utf8'),{})
 
-        self.uid = self.common.authenticate(self.db, self.user, '1nn0b4d0r4', {})
-
     def _get_models(self):
         '''
         Returns Odoo API models object
         '''
         self.models = client.ServerProxy('{}/xmlrpc/2/object'.format(self.url))
-
 
     def _execute_kw(self, model, method, params, opt_params = None):
         '''
@@ -171,6 +168,18 @@ class Odoo():
         }]
         self._execute_kw('crm.lead', 'create', params)
 
-
-
-
+    def _get_leads_with_some_fields(self, l_fields):
+        '''
+        Return list of CRM leads. Fields is a list of crm_lead fields
+        '''
+        if not self.uid:
+            self._login()
+            self._get_models()
+        leads_ids = self._execute_kw('crm.lead', 'search', [[]])
+        if leads_ids:
+            opt_params = {
+                'fields': l_fields,
+            }
+            return self._execute_kw('crm.lead', 'read',
+                                    [leads_ids], opt_params)
+        return None
