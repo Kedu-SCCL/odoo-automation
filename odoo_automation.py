@@ -154,7 +154,9 @@ class Odoo():
         '''
         self._login()
         self._get_models()
-        lead_id = self._get_lead_next_id()
+        # I realized that passing always 0 it works, so skipping one step
+        #lead_id = self._get_lead_next_id()
+        lead_id = 0
         now_str = datetime.now().strftime(self.date_format)
         params = [{
            'id': lead_id,
@@ -166,7 +168,7 @@ class Odoo():
            'date_last_stage_update': now_str,
            'create_date': now_str,
         }]
-        self._execute_kw('crm.lead', 'create', params)
+        return(self._execute_kw('crm.lead', 'create', params))
 
     def _get_leads_with_some_fields(self, l_fields):
         '''
