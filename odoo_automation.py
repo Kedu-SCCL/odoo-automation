@@ -54,7 +54,7 @@ class Odoo():
         '''
         Returns ids of invoices issued
         '''
-        params = [[['type', '=', 'out_invoice']]]
+        params = [[['type', '=', 'out_invoice'], ['state', '=', 'posted']]]
         # IMPORTANT: the order of the list is determined here
         sortBy = "date asc, amount_untaxed desc"
         opt_params = {
