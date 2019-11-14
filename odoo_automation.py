@@ -62,15 +62,14 @@ class Odoo():
         }
         return self._execute_kw('account.move', 'search', params, opt_params)
 
-    def _get_invoices_issued_partner_display_name(self):
+    def _get_invoices_issued(self, fields):
         '''
         Returns list of invoices issued with invoice_partner_display_name
         '''
         opt_params = {
-            'fields': ['name', 'date', 'invoice_partner_display_name',
-                      'amount_untaxed', 'amount_tax', 'amount_total',
-                      'invoice_payment_state']
+            'fields': fields,
         }
+
         return self._execute_kw('account.move', 'read',
                                 [self.invoices_issued_ids], opt_params)
 
@@ -92,20 +91,20 @@ class Odoo():
         return self._execute_kw('res.partner', 'search',
                                 [[['name', '=', name]]])
  
-    def get_invoices_issued(self):
+    def get_invoices_issued(self, fields, is_add_vat = True):
         '''
         Returns invoices issuedin a 'hardcoded' format
         '''
         self._login()
         self._get_models()
         self.invoices_issued_ids = self._get_invoices_issued_ids()
-        self.l_invoices_issued =\
-                            self._get_invoices_issued_partner_display_name()
-        return self._get_partner_display_name_replaced_by_to_vat()
+        self.l_invoices_issued = self._get_invoices_issued(fields)
+        if is_add_vat:
+            return(self._add_vat_to_invoice_list())
  
-    def _get_partner_display_name_replaced_by_to_vat(self):
+    def _add_vat_to_invoice_list(self):
         '''
-        Replaces 'partner_display_name' with corresponding VAT number in list
+        Adds VAT correspondiing to 'partner_display_name'
         '''
         vat = None
         new_l_invoices_issued = []
@@ -113,7 +112,6 @@ class Odoo():
             invoice['vat'] = self._get_vat_by_name(
                                        invoice['invoice_partner_display_name'])
             del invoice['id']
-            del invoice['invoice_partner_display_name']
             new_l_invoices_issued.append(invoice)
         return new_l_invoices_issued
             
