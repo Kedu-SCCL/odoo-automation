@@ -161,7 +161,8 @@ class Odoo():
         self.invoices_ids = self._get_invoices_ids()
         self.l_invoices = self._get_invoices(fields)
         if is_add_vat:
-            return(self._add_vat_to_invoice_list())
+            return self._add_vat_to_invoice_list()
+        return self.l_invoices
 
     def _get_invoices_ids(self):
         '''
