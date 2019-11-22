@@ -69,16 +69,18 @@ class Odoo():
         return self._execute_kw('res.partner', 'search',
                                 [[['name', '=', name]]])
  
-    def _add_vat_to_invoice_list(self):
+    def _add_and_remove_fields(self, is_add_vat, is_remove_id):
         '''
         Adds VAT correspondiing to 'partner_display_name'
         '''
         vat = None
         new_l_invoices_issued = []
         for invoice in self.l_invoices:
-            invoice['vat'] = self._get_vat_by_name(
-                                       invoice['invoice_partner_display_name'])
-            del invoice['id']
+            if is_add_vat:
+                invoice['vat'] = self._get_vat_by_name(
+                    invoice['invoice_partner_display_name'])
+            if is_remove_id:
+                del invoice['id']
             new_l_invoices_issued.append(invoice)
         return new_l_invoices_issued
             
@@ -151,7 +153,8 @@ class Odoo():
                                     [leads_ids], opt_params)
         return None
 
-    def get_invoices(self, invoice_type, fields, is_add_vat = True):
+    def get_invoices(self, invoice_type, fields, is_add_vat = True,
+        is_remove_id = True):
         '''
         Returns invoices issued ('out_invoice') or supported ('in_invoice')
         '''
@@ -160,9 +163,9 @@ class Odoo():
         self.invoice_type = invoice_type
         self.invoices_ids = self._get_invoices_ids()
         self.l_invoices = self._get_invoices(fields)
-        if is_add_vat:
-            return self._add_vat_to_invoice_list()
-        return self.l_invoices
+        if not is_add_vat and not is_remove_id:
+            return self.l_invoices
+        return self._add_and_remove_fields(is_add_vat, is_remove_id)
 
     def _get_invoices_ids(self):
         '''
