@@ -18,10 +18,11 @@ class Odoo():
         self.common = None
         self.models = None
         self.uid = None
-        self.invoices_issued_ids = None
+        self.invoices_ids = None
         self.l_invoices_issued = []
         # hardcoded
         self.date_format = '%Y-%m-%d %H:%M:%S'
+        self.invoice_type = False
 
     def _login(self):
         '''
@@ -50,29 +51,6 @@ class Odoo():
                                        b64decode(self.password).decode('utf8'),
                                           model, method, params)
 
-    def _get_invoices_issued_ids(self):
-        '''
-        Returns ids of invoices issued
-        '''
-        params = [[['type', '=', 'out_invoice'], ['state', '=', 'posted']]]
-        # IMPORTANT: the order of the list is determined here
-        sortBy = "date asc, amount_untaxed desc"
-        opt_params = {
-            'order': sortBy,
-        }
-        return self._execute_kw('account.move', 'search', params, opt_params)
-
-    def _get_invoices_issued(self, fields):
-        '''
-        Returns list of invoices issued with invoice_partner_display_name
-        '''
-        opt_params = {
-            'fields': fields,
-        }
-
-        return self._execute_kw('account.move', 'read',
-                                [self.invoices_issued_ids], opt_params)
-
     def _get_vat_by_name(self, name):
         '''
         Returns corresponding VAT number from client's name
@@ -91,24 +69,13 @@ class Odoo():
         return self._execute_kw('res.partner', 'search',
                                 [[['name', '=', name]]])
  
-    def get_invoices_issued(self, fields, is_add_vat = True):
-        '''
-        Returns invoices issuedin a 'hardcoded' format
-        '''
-        self._login()
-        self._get_models()
-        self.invoices_issued_ids = self._get_invoices_issued_ids()
-        self.l_invoices_issued = self._get_invoices_issued(fields)
-        if is_add_vat:
-            return(self._add_vat_to_invoice_list())
- 
     def _add_vat_to_invoice_list(self):
         '''
         Adds VAT correspondiing to 'partner_display_name'
         '''
         vat = None
         new_l_invoices_issued = []
-        for invoice in self.l_invoices_issued:
+        for invoice in self.l_invoices:
             invoice['vat'] = self._get_vat_by_name(
                                        invoice['invoice_partner_display_name'])
             del invoice['id']
@@ -183,3 +150,38 @@ class Odoo():
             return self._execute_kw('crm.lead', 'read',
                                     [leads_ids], opt_params)
         return None
+
+    def get_invoices(self, invoice_type, fields, is_add_vat = True):
+        '''
+        Returns invoices issued ('out_invoice') or supported ('in_invoice')
+        '''
+        self._login()
+        self._get_models()
+        self.invoice_type = invoice_type
+        self.invoices_ids = self._get_invoices_ids()
+        self.l_invoices = self._get_invoices(fields)
+        if is_add_vat:
+            return(self._add_vat_to_invoice_list())
+
+    def _get_invoices_ids(self):
+        '''
+        Returns ids of invoices issued or supported
+        '''
+        params = [[['type', '=', self.invoice_type], ['state', '=', 'posted']]]
+        # IMPORTANT: the order of the list is determined here
+        sortBy = "date asc, amount_untaxed desc"
+        opt_params = {
+            'order': sortBy,
+        }
+        return self._execute_kw('account.move', 'search', params, opt_params)
+
+    def _get_invoices(self, fields):
+        '''
+        Returns list of invoices issued or supported with fields
+        '''
+        opt_params = {
+            'fields': fields,
+        }
+        return self._execute_kw('account.move', 'read',
+            [self.invoices_ids], opt_params)
+

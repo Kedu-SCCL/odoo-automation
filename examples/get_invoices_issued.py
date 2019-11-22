@@ -10,4 +10,4 @@ o = Odoo(url = odoo_url, db = odoo_db, user = odoo_user, password =
 fields = ('name', 'date', 'invoice_partner_display_name',
           'amount_untaxed', 'amount_tax', 'amount_total',
                       'invoice_payment_state')
-print(o.get_invoices_issued(fields))
+print(o.get_invoices('out_invoice', fields))
