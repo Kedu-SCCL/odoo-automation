@@ -23,6 +23,9 @@ class Odoo():
         # hardcoded
         self.date_format = '%Y-%m-%d %H:%M:%S'
         self.invoice_type = False
+        # Initialize
+        self._login()
+        self._get_models()
 
     def _login(self):
         '''
@@ -158,8 +161,6 @@ class Odoo():
         '''
         Returns invoices issued ('out_invoice') or supported ('in_invoice')
         '''
-        self._login()
-        self._get_models()
         self.invoice_type = invoice_type
         self.invoices_ids = self._get_invoices_ids()
         self.l_invoices = self._get_invoices(fields)
@@ -188,4 +189,12 @@ class Odoo():
         }
         return self._execute_kw('account.move', 'read',
             [self.invoices_ids], opt_params)
+
+    def get_invoice_attachment_by_invoice_id(self, invoices_ids):
+        '''
+        Return list of ir (information repositories)
+        '''
+        opt_params = {}
+        return self._execute_kw('ir.attachment', 'read',
+            [invoices_ids], opt_params)
 
