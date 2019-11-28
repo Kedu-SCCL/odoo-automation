@@ -22,7 +22,6 @@ class Odoo():
         self.l_invoices_issued = []
         # hardcoded
         self.date_format = '%Y-%m-%d %H:%M:%S'
-        self.invoice_type = False
         # Initialize
         self._login()
         self._get_models()
@@ -161,7 +160,6 @@ class Odoo():
         '''
         Returns invoices issued ('out_invoice') or supported ('in_invoice')
         '''
-        self.invoice_type = invoice_type
         self.invoices_ids = self._get_invoices_ids(invoice_type)
         self.l_invoices = self._get_invoices(fields)
         if not is_add_vat and not is_remove_id:
@@ -174,7 +172,7 @@ class Odoo():
         '''
         params = [['state', '=', 'posted']]
         if invoice_type:
-            params.append(['type', '=', self.invoice_type])
+            params.append(['type', '=', invoice_type])
         params = [params]
         # IMPORTANT: the order of the list is determined here
         sortBy = "date asc, amount_untaxed desc"

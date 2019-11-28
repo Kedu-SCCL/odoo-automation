@@ -1,3 +1,4 @@
 *.pyc
 settings.py
 cache/*.cache
+*custom.py
