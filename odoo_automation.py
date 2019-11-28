@@ -162,17 +162,20 @@ class Odoo():
         Returns invoices issued ('out_invoice') or supported ('in_invoice')
         '''
         self.invoice_type = invoice_type
-        self.invoices_ids = self._get_invoices_ids()
+        self.invoices_ids = self._get_invoices_ids(invoice_type)
         self.l_invoices = self._get_invoices(fields)
         if not is_add_vat and not is_remove_id:
             return self.l_invoices
         return self._add_and_remove_fields(is_add_vat, is_remove_id)
 
-    def _get_invoices_ids(self):
+    def _get_invoices_ids(self, invoice_type = None):
         '''
         Returns ids of invoices issued or supported
         '''
-        params = [[['type', '=', self.invoice_type], ['state', '=', 'posted']]]
+        params = [['state', '=', 'posted']]
+        if invoice_type:
+            params.append(['type', '=', self.invoice_type])
+        params = [params]
         # IMPORTANT: the order of the list is determined here
         sortBy = "date asc, amount_untaxed desc"
         opt_params = {
