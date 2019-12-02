@@ -217,7 +217,7 @@ class Odoo():
         Return invoice object with default fields given its id
         '''
         return self._execute_kw('account.move', 'read',
-            [invoice_id])
+            [invoice_id])[0]
 
 
 
