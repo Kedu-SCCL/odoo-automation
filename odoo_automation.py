@@ -191,11 +191,24 @@ class Odoo():
         return self._execute_kw('account.move', 'read',
             [self.invoices_ids], opt_params)
 
-    def get_invoice_attachment_by_invoice_id(self, invoices_ids):
+    def _get_l_attachment_id_by_l_invoice_id(self, l_invoice_id):
         '''
-        Return list of ir (information repositories)
+        Return list of attachment id given list of invoice id
         '''
+        params = [[
+            ['res_model', '=', 'account.move'],
+            ['res_id', 'in', l_invoice_id],
+        ]]
+        opt_params = {'order': 'id'}
+        return self._execute_kw('ir.attachment', 'search', params, opt_params)
+
+    def get_l_invoice_attachment_by_l_invoice_id(self, l_invoices_id):
+        '''
+        Return list of ir (information repositories) given list of invoice id
+        '''
+        l_attachment_id = self._get_l_attachment_id_by_l_invoice_id(
+            l_invoices_id)
         opt_params = {}
         return self._execute_kw('ir.attachment', 'read',
-            [invoices_ids], opt_params)
+            [l_attachment_id], opt_params)
 
