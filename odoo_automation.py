@@ -212,3 +212,13 @@ class Odoo():
         return self._execute_kw('ir.attachment', 'read',
             [l_attachment_id], opt_params)
 
+    def get_invoice_by_id(self, invoice_id):
+        '''
+        Return invoice object with default fields given its id
+        '''
+        return self._execute_kw('account.move', 'read',
+            [invoice_id])
+
+
+
+
